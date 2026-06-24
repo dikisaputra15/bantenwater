@@ -24,6 +24,10 @@
                 </div>
 
               </form>
+
+               <div class="text-center mt-4 font-weight-light">
+                  Don't have an account? <a href="{{ route('register') }}" class="text-primary">Create</a>
+                </div>
             </div>
           </div>
         </div>

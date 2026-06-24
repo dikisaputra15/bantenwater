@@ -79,5 +79,37 @@
             </a>
           </li>
           <?php } ?>
+
+          <?php if(auth()->user()->roles == 'pimpinan'){ ?>
+        <li class="nav-item">
+                <a class="nav-link" data-toggle="collapse" href="#charts" aria-expanded="false" aria-controls="charts">
+                <i class="icon-bar-graph menu-icon"></i>
+                <span class="menu-title<li class="nav-item">
+            <a class="nav-link" data-toggle="collapse" href="#tables" aria-expanded="false" aria-controls="tables">
+              <i class="icon-grid-2 menu-icon"></i>
+              <span class="menu-title">Produk</span>
+            </a>
+          </li>
+
+           <li class="nav-item">
+                <a class="nav-link" data-toggle="collapse" href="#charts" aria-expanded="false" aria-controls="charts">
+                <i class="icon-bar-graph menu-icon"></i>
+                <span class="menu-title<li class="nav-item">
+            <a class="nav-link" data-toggle="collapse" href="#tables" aria-expanded="false" aria-controls="tables">
+              <i class="icon-grid-2 menu-icon"></i>
+              <span class="menu-title">Pembayaran</span>
+            </a>
+          </li>
+
+          <li class="nav-item">
+                <a class="nav-link" data-toggle="collapse" href="#charts" aria-expanded="false" aria-controls="charts">
+                <i class="icon-bar-graph menu-icon"></i>
+                <span class="menu-title<li class="nav-item">
+            <a class="nav-link" data-toggle="collapse" href="#tables" aria-expanded="false" aria-controls="tables">
+              <i class="icon-grid-2 menu-icon"></i>
+              <span class="menu-title">Status Pemesanan</span>
+            </a>
+          </li>
+          <?php } ?>
         </ul>
       </nav>
