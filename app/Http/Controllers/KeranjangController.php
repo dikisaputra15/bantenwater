@@ -46,15 +46,9 @@ class KeranjangController extends Controller
 
     public function createpenjualan(Request $request)
     {
-        $produks = DB::table('produks')
-            ->join('kategoris', 'produks.id_kategori', '=', 'kategoris.id')
-            ->select(
-                'produks.*',
-                'kategoris.nama_kategori'
-            )
-            ->get();
+        $produks = DB::table('produks')->orderBy('id', 'desc')->get();
 
-        return view('pages.keranjangs.createpenjualan', compact('produks'));
+        return view('pages.keranjangs.allproduk', compact('produks'));
     }
 
     public function addToCart(Request $request)

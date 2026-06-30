@@ -27,8 +27,8 @@ class HomeController extends Controller
 
     public function dashboard(Request $request)
     {
-        // $jmlpesanan = Pesanan::where('status', 'Paid')->where('keterangan', 'diproses')->count();
-        return view('pages.dashboard');
+        $produks = DB::table('produks')->orderBy('id', 'desc')->get();
+        return view('pages.dashboard', compact('produks'));
     }
 
     public function lihatpdf(Request $request)

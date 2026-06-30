@@ -8,21 +8,42 @@
         </button>
 
         <ul class="navbar-nav navbar-nav-right">
-          <li class="nav-item nav-profile dropdown">
-            <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" id="profileDropdown">
+                @php
+                    $cartCount = count(session('cart', []));
+                @endphp
+            <li class="nav-item mx-1">
+                <a class="nav-link" href="{{ route('cart') }}">
+                    <i class="mdi mdi-cart" style="font-size: 32px;"></i>
+
+                    @if($cartCount > 0)
+                        <span class="badge badge-danger badge-counter">
+                            {{ $cartCount }}
+                        </span>
+                    @endif
+                </a>
+            </li>
+
+          <li class="nav-item nav-profile">
+            <a class="nav-link" href="#">
               <img src="{{ asset('images/faces/face28.jpg') }}" alt="profile"/>
             </a>
-            <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
-              <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit()">
-                <i class="ti-power-off text-primary"></i>
+          </li>
+
+        <li class="nav-item mx-1">
+            <h5>
+                {{ auth()->user()->roles }}
+            </h5>
+        </li>
+
+          <li class="nav-item mx-1">
+                <a class="btn btn-success" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit()">
                 Logout
               </a>
 
                <form id="logout-form" action="{{route('logout')}}" method="POST" class="d-none">
                     @csrf
                 </form>
-            </div>
-          </li>
+            </li>
 
         </ul>
 

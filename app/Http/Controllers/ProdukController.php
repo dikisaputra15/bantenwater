@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class ProdukController extends Controller
 {
@@ -60,29 +61,29 @@ class ProdukController extends Controller
         $old_file = $request->old_file;
         $file = $request->file('gambar');
 
-        if($cekfile != ""){
-            $filedel = Storage::url('gambarproduk/'. $old_file);
+        if ($cekfile != "") {
 
-            if(File::exists($filedel)) {
-                File::delete($filedel);
+            if (Storage::exists('public/gambarproduk/' . $old_file)) {
+                Storage::delete('public/gambarproduk/' . $old_file);
             }
 
             $extension = $file->getClientOriginalExtension();
 
-            $nama_file = str_replace(" ", "-", $request->gambar);
+            $nama_file = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $nama_file = str_replace(" ", "-", $nama_file);
+
             $num = hexdec(uniqid());
 
-            $filename = $nama_file.'_'.$num.'.'.$extension;
+            $filename = $nama_file . '_' . $num . '.' . $extension;
 
             Storage::putFileAs('public/gambarproduk', $file, $filename);
 
-
-            DB::table('produks')->where('id',$id)->update([
-                'nama_produk' => $request->nama_produk,
-                'stock' => $request->stock,
-                'harga' => $request->harga,
+            DB::table('produks')->where('id', $id)->update([
+                'nama_produk'      => $request->nama_produk,
+                'stock'            => $request->stock,
+                'harga'            => $request->harga,
                 'deskripsi_produk' => $request->deskripsi_produk,
-                'path_gambar' => $filename
+                'path_gambar'      => $filename
             ]);
         }else{
             DB::table('produks')->where('id',$id)->update([

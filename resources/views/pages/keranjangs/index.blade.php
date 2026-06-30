@@ -93,7 +93,7 @@
                                 <a href="{{ route('cart.remove',$item['id']) }}"
                                    class="btn btn-danger btn-sm">
 
-                                    <i class="fas fa-trash"></i>
+                                    <i class="mdi mdi-delete"></i>
 
                                 </a>
 
@@ -139,7 +139,7 @@
             </button>
 
             <a href="{{ route('checkout') }}" class="btn btn-success">
-                Proses Pembayaran
+                Order
             </a>
 
         </div>

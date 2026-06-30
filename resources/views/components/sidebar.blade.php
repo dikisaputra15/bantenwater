@@ -76,21 +76,21 @@
 
           <?php if(auth()->user()->roles == 'pelanggan'){ ?>
         <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#tables" aria-expanded="false" aria-controls="tables">
+            <a class="nav-link" href="{{ url('/keranjang/allproduk') }}">
               <i class="icon-grid-2 menu-icon"></i>
               <span class="menu-title">Produk</span>
             </a>
           </li>
 
            <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#tables" aria-expanded="false" aria-controls="tables">
+            <a class="nav-link" href="{{ Route('pembayaran.all') }}">
               <i class="icon-grid-2 menu-icon"></i>
               <span class="menu-title">Pembayaran</span>
             </a>
           </li>
 
           <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#tables" aria-expanded="false" aria-controls="tables">
+            <a class="nav-link" href="{{ route('pesanan.status') }}">
               <i class="icon-grid-2 menu-icon"></i>
               <span class="menu-title">Status Pemesanan</span>
             </a>

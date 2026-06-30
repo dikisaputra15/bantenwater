@@ -1,324 +1,420 @@
 @extends('layouts.app')
 
-@section('title','Proses Pembayaran')
+@section('title', 'Dashboard')
+
+@push('style')
+
+@endpush
 
 @section('main')
 
-<div class="container-fluid">
+<div class="row">
+    <div class="col-md-12 grid-margin">
+            <div class="row">
+                <div class="col-12 col-xl-8 mb-4 mb-xl-0">
+                  <h3 class="font-weight-bold">Pembayaran</h3>
+                  <p>Dashboard/Pembayaran</p>
+                </div>
 
-    <h1 class="h3 mb-4 text-gray-800">
-        Detail Pesanan
-    </h1>
+                @if($pesanans->count())
 
-    <form id="checkoutForm">
+<div class="card shadow mt-5">
 
-        @csrf
+    <div class="card-header bg-primary text-white">
 
-        <div class="row">
+        <h4 class="mb-0">
+            Data Pesanan
+        </h4>
 
-            {{-- Detail Pesanan --}}
-            <div class="col-md-8">
+    </div>
 
-                <div class="card shadow mb-4">
+    <div class="card-body">
 
-                    <div class="card-header">
-                        <strong>Pesanan Anda</strong>
-                    </div>
+        <div class="table-responsive">
 
-                    <div class="card-body">
+            <table class="table table-bordered table-hover" id="dataTable">
+
+                <thead class="thead-light">
+
+                    <tr>
+
+                        <th>No</th>
+                        <th>Kode Pesanan</th>
+                        <th>Total</th>
+                        <th>Status Pesanan</th>
+                        <th>Status Pembayaran</th>
+                        <th>Pembayaran</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @foreach($pesanans as $key => $row)
+
+                    <tr>
+
+                        <td>{{ $key+1 }}</td>
+
+                        <td>
+                            <a href="#"
+                            data-toggle="modal"
+                            data-target="#detailPesanan{{ $row->id }}">
+
+                                {{ $row->kode_pesanan }}
+
+                            </a>
+                        </td>
+
+                        <td>
+                            Rp {{ number_format($row->total,0,',','.') }}
+                        </td>
+
+                        <td>
+
+                            <span class="badge badge-info">
+
+                                {{ strtoupper($row->status_pesanan) }}
+
+                            </span>
+
+                        </td>
+
+                        <td>
+
+                            @if($row->status_pembayaran=='belum bayar')
+
+                                <span class="badge badge-danger">
+
+                                    BELUM BAYAR
+
+                                </span>
+
+                            @elseif($row->status_pembayaran=='menunggu verifikasi')
+
+                                <span class="badge badge-warning">
+
+                                    MENUNGGU VERIFIKASI
+
+                                </span>
+
+                            @else
+
+                                <span class="badge badge-success">
+
+                                    LUNAS
+
+                                </span>
+
+                            @endif
+
+                        </td>
+
+                        <td>
+
+                            @if(empty($row->bukti_pembayaran))
+
+                                <button
+                                    class="btn btn-primary btn-sm"
+                                    data-toggle="modal"
+                                    data-target="#upload{{ $row->id }}">
+
+                                    Upload Bukti
+
+                                </button>
+
+                            @else
+
+                                <img
+                                    src="{{ Storage::url('bukti_pembayaran/'.$row->bukti_pembayaran) }}"
+                                    width="120"
+                                    class="img-thumbnail">
+
+                            @endif
+
+                        </td>
+
+                    </tr>
+
+                    @endforeach
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+@endif
+
+            </div>
+    </div>
+</div>
+
+@foreach($pesanans as $row)
+<div class="modal fade"
+     id="detailPesanan{{ $row->id }}"
+     tabindex="-1">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-header bg-primary text-white">
+
+                <h5 class="modal-title">
+
+                    Detail Pesanan
+                    <br>
+                    <small>{{ $row->kode_pesanan }}</small>
+
+                </h5>
+
+                <button
+                    class="close text-white"
+                    data-dismiss="modal">
+
+                    <span>&times;</span>
+
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <table class="table table-bordered">
+
+                    <thead class="thead-light">
+
+                        <tr>
+
+                            <th width="80">Foto</th>
+                            <th>Produk</th>
+                            <th>Harga</th>
+                            <th>Qty</th>
+                            <th>Subtotal</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
 
                         @php
                             $grandTotal = 0;
                         @endphp
 
-                        <div class="table-responsive">
+                        @foreach($row->detail as $detail)
 
-                            <table class="table table-bordered">
+                        @php
+                            $grandTotal += $detail->sub_total;
+                        @endphp
 
-                                <thead>
-                                    <tr>
-                                        <th>Produk</th>
-                                        <th>Harga</th>
-                                        <th width="100">Qty</th>
-                                        <th>Subtotal</th>
-                                    </tr>
-                                </thead>
+                        <tr>
 
-                                <tbody>
+                            <td>
 
-                                @foreach($cart as $item)
+                                <img
+                                    src="{{ Storage::url('gambarproduk/'.$detail->path_gambar) }}"
+                                    width="70"
+                                    class="img-thumbnail">
 
-                                    @php
-                                        $qty = $item['qty'] ?? $item['stock'] ?? 1;
-                                        $subtotal = $item['harga'] * $qty;
-                                        $grandTotal += $subtotal;
-                                    @endphp
+                            </td>
 
-                                    <tr>
+                            <td>
 
-                                        <td>
-                                            {{ $item['nama_produk'] }}
-                                        </td>
+                                {{ $detail->nama_produk }}
 
-                                        <td>
-                                            Rp {{ number_format($item['harga'],0,',','.') }}
-                                        </td>
+                            </td>
 
-                                        <td>
-                                            {{ $qty }}
-                                        </td>
+                            <td>
 
-                                        <td>
-                                            Rp {{ number_format($subtotal,0,',','.') }}
-                                        </td>
+                                Rp {{ number_format($detail->harga,0,',','.') }}
 
-                                    </tr>
+                            </td>
 
-                                @endforeach
+                            <td>
 
-                                </tbody>
+                                {{ $detail->qty }}
 
-                                <tfoot>
+                            </td>
 
-                                    <tr>
+                            <td>
 
-                                        <th colspan="3" class="text-right">
-                                            Total
-                                        </th>
+                                Rp {{ number_format($detail->sub_total,0,',','.') }}
 
-                                        <th class="text-success">
-                                            Rp {{ number_format($grandTotal,0,',','.') }}
-                                        </th>
+                            </td>
 
-                                    </tr>
+                        </tr>
 
-                                </tfoot>
+                        @endforeach
 
-                            </table>
+                    </tbody>
 
-                        </div>
+                    <tfoot>
 
-                    </div>
+                        <tr>
 
-                </div>
+                            <th colspan="4" class="text-right">
+
+                                Grand Total
+
+                            </th>
+
+                            <th>
+
+                                Rp {{ number_format($grandTotal,0,',','.') }}
+
+                            </th>
+
+                        </tr>
+
+                    </tfoot>
+
+                </table>
 
             </div>
 
-            {{-- Pembayaran --}}
-            <div class="col-md-4">
+            <div class="modal-footer">
 
-                <div class="card shadow">
+                <button
+                    class="btn btn-secondary"
+                    data-dismiss="modal">
 
-                    <div class="card-header">
-                        <strong>Metode Pembayaran</strong>
-                    </div>
+                    Tutup
 
-                    <div class="card-body">
-
-                        <div class="form-group">
-
-                            <label>Nama Pembeli</label>
-
-                            <input
-                                type="text"
-                                name="nama_pembeli"
-                                class="form-control"
-                                required>
-
-                        </div>
-
-                        <div class="form-group">
-
-                            <label>No HP</label>
-
-                            <input
-                                type="text"
-                                name="no_hp"
-                                class="form-control"
-                                required>
-
-                        </div>
-
-                        <div class="form-group">
-
-                            <label>Pilih Pembayaran</label>
-
-                            <div class="custom-control custom-radio mb-2">
-
-                                <input
-                                    type="radio"
-                                    id="cash"
-                                    name="metode_pembayaran"
-                                    value="Cash"
-                                    class="custom-control-input"
-                                    checked>
-
-                                <label class="custom-control-label" for="cash">
-                                    Cash
-                                </label>
-
-                            </div>
-
-                            <div class="custom-control custom-radio">
-
-                                <input
-                                    type="radio"
-                                    id="qris"
-                                    name="metode_pembayaran"
-                                    value="QRIS"
-                                    class="custom-control-input">
-
-                                <label class="custom-control-label" for="qris">
-                                    QRIS / Transfer
-                                </label>
-
-                            </div>
-
-                        </div>
-
-                        <hr>
-
-                        <h5>Total Bayar</h5>
-
-                        <h3 class="text-success">
-                            Rp {{ number_format($grandTotal,0,',','.') }}
-                        </h3>
-
-                        <button
-                            type="button"
-                            id="btnCheckout"
-                            class="btn btn-success btn-block mt-3">
-
-                            Konfirmasi Pembayaran
-
-                        </button>
-
-                    </div>
-
-                </div>
+                </button>
 
             </div>
 
         </div>
 
-    </form>
+    </div>
 
 </div>
+@endforeach
+
+
+@foreach($pesanans as $row)
+
+@if(empty($row->bukti_pembayaran))
+
+<div class="modal fade"
+     id="upload{{ $row->id }}"
+     tabindex="-1"
+     role="dialog"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <form action="{{ route('pesanan.upload', $row->id) }}"
+                  method="POST"
+                  enctype="multipart/form-data">
+
+                @csrf
+
+                <div class="modal-header bg-primary text-white">
+
+                    <h5 class="modal-title">
+                        Upload Bukti Pembayaran
+                    </h5>
+
+                    <button type="button"
+                            class="close text-white"
+                            data-dismiss="modal">
+
+                        <span>&times;</span>
+
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="text-center mb-4">
+
+                        <h5>{{ $row->kode_pesanan }}</h5>
+
+                        <h4 class="text-success">
+                            Rp {{ number_format($row->total,0,',','.') }}
+                        </h4>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>
+                            Bukti Pembayaran
+                        </label>
+
+                        <input type="file"
+                               name="bukti"
+                               class="form-control"
+                               accept="image/*"
+                               required>
+
+                        <small class="text-muted">
+                            Format: JPG, JPEG atau PNG.
+                        </small>
+
+                    </div>
+
+                    <div class="alert alert-info mb-0">
+
+                        <strong>Petunjuk:</strong><br>
+
+                        • Transfer sesuai nominal pesanan.<br>
+                        • Upload foto/screenshot bukti transfer yang jelas.
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-dismiss="modal">
+
+                        Batal
+
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-success">
+
+                        <i class="mdi mdi-upload"></i>
+
+                        Upload Bukti
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+@endif
+
+@endforeach
 
 @endsection
 
 @push('scripts')
-
-<script
-src="https://app.sandbox.midtrans.com/snap/snap.js"
-data-client-key="{{ config('midtrans.client_key') }}">
-</script>
-
-<script>
-
-$('#btnCheckout').click(function(){
-
-    let nama = $('input[name="nama_pembeli"]').val();
-    let nohp = $('input[name="no_hp"]').val();
-    let metode = $('input[name="metode_pembayaran"]:checked').val();
-
-    if(nama === ''){
-        alert('Nama pembeli wajib diisi');
-        return;
-    }
-
-    if(nohp === ''){
-        alert('No HP wajib diisi');
-        return;
-    }
-
-    $('#btnCheckout')
-        .prop('disabled', true)
-        .text('Memproses...');
-
-    $.ajax({
-
-        url: "{{ route('checkout.create-order') }}",
-
-        type: "POST",
-
-        data: {
-
-            _token: "{{ csrf_token() }}",
-
-            nama_pembeli: nama,
-
-            no_hp: nohp,
-
-            metode_pembayaran: metode
-
-        },
-
-        success: function(response){
-
-            if(response.type === 'cash'){
-
-                window.location.href = response.redirect;
-
-            }
-
-            if(response.type === 'qris'){
-
-                snap.pay(response.snap_token, {
-
-                    onSuccess: function(result){
-
-                        window.location.href = "{{ route('allpesanan') }}";
-
-                    },
-
-                    onPending: function(result){
-
-                        alert('Menunggu pembayaran');
-
-                        window.location.href = "{{ route('allpesanan') }}";
-
-                    },
-
-                    onError: function(result){
-
-                        alert('Pembayaran gagal');
-
-                        window.location.href = "{{ route('allpesanan') }}";
-
-                    },
-
-                    onClose: function(){
-
-                        window.location.href = "{{ route('allpesanan') }}";
-
-                    }
-
-                });
-
-            }
-
-        },
-
-        error: function(xhr){
-
-            console.log(xhr.responseText);
-
-            alert(
-                xhr.responseJSON?.message ??
-                'Terjadi kesalahan pada server'
-            );
-
-            $('#btnCheckout')
-                .prop('disabled', false)
-                .text('Konfirmasi Pembayaran');
-
-        }
-
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#dataTable').DataTable();
     });
-
-});
-
 </script>
-
 @endpush

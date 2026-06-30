@@ -2,6 +2,16 @@
 
 @section('title', 'Create Penjualan')
 
+@push('style')
+<style>
+.rating i{
+    color:#ff9800;
+    font-size:32px;
+    margin:0 2px;
+}
+</style>
+@endpush
+
 @section('main')
 
 @if(session('success'))
@@ -13,43 +23,47 @@
 </div>
 @endif
 
-<h1 class="h3 mb-4 text-gray-800">Aneka Macam Kelapa Kelapa</h1>
+<h1 class="h3 mb-4 text-gray-800">Produk</h1>
+<p>Dashboard/Produk</p>
 
 <div class="row">
 
     @forelse($produks as $produk)
-        <div class="col-xl-3 col-md-4 col-sm-6 mb-4">
+        <div class="col-xl-12 col-md-4 col-sm-6 mb-4">
             <div class="card shadow h-100">
-
-                @if($produk->path_gambar)
+                <div class="row">
+                <div class="col-md-6">
+                    @if($produk->path_gambar)
                     <img src="{{ Storage::url('gambarproduk/'.$produk->path_gambar) }}"
                         class="card-img-top"
-                        style="height:220px; object-fit:cover;">
-                @else
-                    <img src="https://via.placeholder.com/300x220?text=Kelapa"
-                         class="card-img-top"
-                         style="height:220px; object-fit:cover;">
-                @endif
+                        style="height:300px;">
+                    @else
+                        <img src="https://via.placeholder.com/300x220?text=Kelapa"
+                            class="card-img-top"
+                            style="height:300px;">
+                    @endif
+                </div>
 
-                <div class="card-body">
+                <div class="col-md-6">
+                    <div class="card-body">
                     <h5 class="card-title font-weight-bold">
                         {{ $produk->nama_produk }}
                     </h5>
-
-                    <p class="text-muted mb-2">
-                        {{ $produk->deskripsi_produk }}
-                    </p>
 
                     <h4 class="text-success font-weight-bold">
                         Rp {{ number_format($produk->harga,0,',','.') }}
                     </h4>
 
-                    <p class="mb-2">
-                        Stock :
-                        <span class="badge badge-info">
-                            {{ $produk->stock }}
-                        </span>
-                    </p>
+                    <div class="rating text-center mt-4">
+
+                        <i class="mdi mdi-star"></i>
+                        <i class="mdi mdi-star"></i>
+                        <i class="mdi mdi-star"></i>
+                        <i class="mdi mdi-star"></i>
+                        <i class="mdi mdi-star"></i>
+
+                    </div>
+
                 </div>
 
                 <div class="card-footer bg-white">
@@ -59,15 +73,16 @@
                         <input type="hidden" name="produk_id" value="{{ $produk->id }}">
 
                         <div class="input-group">
-                            <div class="input-group-append">
                                 <button type="submit"
-                                        class="btn btn-success">
-                                    <i class="fas fa-cart-plus"></i>
+                                        class="btn btn-primary">
                                     Tambah
                                 </button>
-                            </div>
                         </div>
                     </form>
+                </div>
+                </div>
+
+
                 </div>
 
             </div>
@@ -75,7 +90,7 @@
     @empty
         <div class="col-12">
             <div class="alert alert-warning">
-                Belum ada produk kelapa tersedia.
+                Belum ada produk tersedia.
             </div>
         </div>
     @endforelse

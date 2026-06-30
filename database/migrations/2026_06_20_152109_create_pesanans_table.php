@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('pesanans', function (Blueprint $table) {
             $table->id();
+            $table->integer('id_user');
+            $table->text('kode_pesanan');
+            $table->date('tgl_pemesanan');
+            $table->enum('status_pesanan', ['dipesan', 'dikirim', 'dalam perjalanan', 'selesai']);
+            $table->enum('status_pembayaran', ['belum bayar', 'menunggu verifikasi', 'lunas']);
+            $table->double('total');
+            $table->string('bukti_pembayaran')->nullable();
             $table->timestamps();
         });
     }

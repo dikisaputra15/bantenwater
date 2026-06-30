@@ -8,13 +8,8 @@
         <div class="auth-form-light text-left py-5 px-4 px-sm-5">
 
             <div class="brand-logo">
-                <h3>Banten Water</h3>
+                <h3>Register</h3>
             </div>
-
-            <h4>Create Account</h4>
-            <h6 class="font-weight-light mb-4">
-                Register a new account
-            </h6>
 
             <form method="POST" action="{{ route('register') }}">
                 @csrf
@@ -23,7 +18,7 @@
                     <input type="text"
                            class="form-control form-control-lg"
                            name="name"
-                           placeholder="Full Name"
+                           placeholder="Nama"
                            value="{{ old('name') }}"
                            required>
                 </div>
@@ -46,26 +41,34 @@
                 </div>
 
                 <div class="form-group">
-                    <input type="password"
+                    <input type="text"
                            class="form-control form-control-lg"
-                           name="password_confirmation"
-                           placeholder="Confirm Password"
+                           name="alamat_lengkap"
+                           placeholder="Alamat Lengkap"
+                           required>
+                </div>
+
+                 <div class="form-group">
+                    <input type="text"
+                           class="form-control form-control-lg"
+                           name="no_hp"
+                           placeholder="No Hp"
                            required>
                 </div>
 
                 <div class="mt-3">
                     <button type="submit"
                             class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn">
-                        REGISTER
+                        Daftar
                     </button>
                 </div>
 
-                <div class="text-center mt-4 font-weight-light">
+                <!-- <div class="text-center mt-4 font-weight-light">
                     Already have an account?
                     <a href="{{ route('login') }}" class="text-primary">
                         Login
                     </a>
-                </div>
+                </div> -->
 
             </form>
 

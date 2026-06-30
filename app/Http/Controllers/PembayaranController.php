@@ -7,6 +7,7 @@ use App\Models\Detailpesanan;
 use App\Models\Produk;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Midtrans\Config;
 use Midtrans\Snap;
@@ -16,9 +17,23 @@ class PembayaranController extends Controller
     public function index(Request $request)
     {
         $pesanans = DB::table('pesanans')
-                ->join('mejas', 'mejas.id', '=', 'pesanans.id_meja')
-                ->select('pesanans.*', 'mejas.no_meja')
-                ->orderBy('pesanans.id', 'desc')->get();
+                    ->where('id_user', auth()->id())
+                    ->orderByDesc('id')
+                    ->get();
+
+        foreach ($pesanans as $pesanan) {
+
+        $pesanan->detail = DB::table('detailpesanans')
+                ->join('produks', 'detailpesanans.id_produk', '=', 'produks.id')
+                ->select(
+                    'detailpesanans.*',
+                    'produks.nama_produk',
+                    'produks.path_gambar'
+                )
+                ->where('detailpesanans.id_pesanan', $pesanan->id)
+                ->get();
+        }
+
         return view('pages.pembayarans.index', compact('pesanans'));
     }
 
@@ -165,13 +180,67 @@ class PembayaranController extends Controller
     public function checkout()
     {
         $cart = session('cart', []);
+        $tgl = Carbon::now();
+        $tgl_now = $tgl->format('Y-m-d');
 
-        if(count($cart) == 0){
-            return redirect()->route('cart')
-                ->with('error','Keranjang masih kosong');
+        if (count($cart) == 0) {
+            return back()->with('error', 'Keranjang masih kosong.');
         }
 
-        return view('pages.pembayarans.index', compact('cart'));
+        DB::beginTransaction();
+
+        try {
+
+            $total = 0;
+
+            foreach ($cart as $item) {
+                $total += $item['harga'] * $item['stock'];
+            }
+
+            $pesananId = DB::table('pesanans')->insertGetId([
+                'id_user'       => Auth::id(),
+                'kode_pesanan'  => 'ORD-' . date('YmdHis') . rand(100,999),
+                'tgl_pemesanan' => $tgl_now,
+                'status_pesanan'        => 'dipesan',
+                'status_pembayaran'        => 'belum bayar',
+                'total'         => $total,
+                'bukti_pembayaran' => NULL,
+                'created_at'    => now(),
+                'updated_at'    => now()
+            ]);
+
+            foreach ($cart as $item) {
+
+                DB::table('detailpesanans')->insert([
+                    'id_pesanan' => $pesananId,
+                    'id_produk'  => $item['id'],
+                    'harga'      => $item['harga'],
+                    'qty'        => $item['stock'],
+                    'sub_total'   => $item['harga'] * $item['stock'],
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+
+                DB::table('produks')
+                    ->where('id', $item['id'])
+                    ->decrement('stock', $item['stock']);
+
+            }
+
+            session()->forget('cart');
+
+            DB::commit();
+
+            return redirect()
+                ->route('pembayaran.all')
+                ->with('success', 'Pesanan berhasil dibuat.');
+
+        } catch (\Exception $e) {
+
+            DB::rollback();
+
+            return back()->with('error', $e->getMessage());
+        }
     }
 
     public function createOrder(Request $request)
@@ -271,5 +340,29 @@ class PembayaranController extends Controller
                 'message' => $e->getMessage()
             ],500);
         }
+    }
+
+    public function uploadBukti(Request $request, $id)
+    {
+        $request->validate([
+            'bukti' => 'required|image|mimes:jpg,jpeg,png|max:2048'
+        ]);
+
+        $filename = time().'.'.$request->bukti->extension();
+
+        $request->bukti->storeAs(
+            'public/bukti_pembayaran',
+            $filename
+        );
+
+        DB::table('pesanans')
+            ->where('id', $id)
+            ->update([
+                'bukti_pembayaran' => $filename,
+                'status_pembayaran' => 'menunggu verifikasi',
+                'updated_at' => now()
+            ]);
+
+        return back()->with('success', 'Bukti pembayaran berhasil diupload.');
     }
 }

@@ -6,7 +6,7 @@ use App\Http\Controllers\WarungController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\KeranjangController;
-use App\Http\Controllers\MejaController;
+use App\Http\Controllers\PesananController;
 use App\Http\Controllers\PembayaranController;
 use Illuminate\Support\Facades\Route;
 
@@ -49,7 +49,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/lapproduklaris', [App\Http\Controllers\HomeController::class, 'lapproduklaris']);
     Route::get('/pembayaran/{id}/nota', [App\Http\Controllers\PembayaranController::class, 'nota'])->name('pembayaran.nota');
 
-    Route::get('/penjualan/create', [App\Http\Controllers\KeranjangController::class, 'createpenjualan']);
+    Route::get('/keranjang/allproduk', [App\Http\Controllers\KeranjangController::class, 'createpenjualan']);
+    Route::get('/pembayaran/allpembayaran', [App\Http\Controllers\PembayaranController::class, 'index'])->name('pembayaran.all');
 
     Route::get('/cart', [KeranjangController::class, 'index'])->name('cart');
     Route::post('/cart/add', [KeranjangController::class, 'addToCart'])->name('cart.add');
@@ -64,4 +65,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/pembayaran/{id}/invoice', [PembayaranController::class, 'invoice'])->name('pembayaran.invoice');
 
     Route::post('/midtrans/callback', [PembayaranController::class, 'callback']);
+
+    Route::post('/pesanan/upload/{id}', [PembayaranController::class, 'uploadBukti'])->name('pesanan.upload');
+
+    Route::get('/status-pesanan', [App\Http\Controllers\PesananController::class, 'status'])->name('pesanan.status');
 });
