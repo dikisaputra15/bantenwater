@@ -69,4 +69,42 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/pesanan/upload/{id}', [PembayaranController::class, 'uploadBukti'])->name('pesanan.upload');
 
     Route::get('/status-pesanan', [App\Http\Controllers\PesananController::class, 'status'])->name('pesanan.status');
+
+    Route::get('/profile', [App\Http\Controllers\UserController::class, 'user'])->name('profile');
+
+    Route::post('/profile/update', [App\Http\Controllers\UserController::class, 'updateuser'])->name('profile.update');
+
+    Route::get('/verifikasi-pembayaran', [App\Http\Controllers\PesananController::class, 'pembayaran'])->name('pembayaran.verify');
+
+    Route::get('/pembayaran/verifikasi/{id}', [App\Http\Controllers\PesananController::class, 'verifikasi'])
+    ->name('pembayaran.verifikasi');
+
+    Route::get('/admin-allpesan', [App\Http\Controllers\PesananController::class, 'adminallpesan'])->name('admin.allpesan');
+
+    Route::get('/laporan', [App\Http\Controllers\LaporanController::class,'index'])->name('laporan.index');
+    Route::get('/laporan/pdf', [App\Http\Controllers\LaporanController::class,'pdf'])->name('laporan.pdf');
+    Route::get('/laporan/print', [App\Http\Controllers\LaporanController::class,'print'])->name('laporan.print');
+
+    Route::get('/permintaan-stok', [App\Http\Controllers\PermintaanStokController::class,'index'])
+    ->name('permintaanstok.index');
+
+    Route::post('/permintaan-stok/{id}/verifikasi', [App\Http\Controllers\PermintaanStokController::class,'verifikasi'])
+        ->name('permintaanstok.verifikasi');
+
+    Route::post('/permintaan-stok/{id}/tolak', [App\Http\Controllers\PermintaanStokController::class,'tolak'])
+        ->name('permintaanstok.tolak');
+
+    Route::get('/permintaan-stok/create/{id}', [App\Http\Controllers\PermintaanStokController::class,'create'])
+    ->name('permintaanstok.create');
+
+    Route::post('/permintaan-stok/store', [App\Http\Controllers\PermintaanStokController::class,'store'])
+        ->name('permintaanstok.store');
+
+    Route::get('/kurir/mulai/{id}', [App\Http\Controllers\KurirController::class,'mulai'])->name('kurir.mulai');
+
+    Route::get('/kurir/selesai/{id}', [App\Http\Controllers\KurirController::class,'selesai'])->name('kurir.selesai');
+
+    Route::get('/pengantaran', [App\Http\Controllers\KurirController::class,'index'])->name('pengantaran.index');
+
+    Route::get('/pengantaran/{id}', [App\Http\Controllers\KurirController::class,'show'])->name('pengantaran.show');
 });

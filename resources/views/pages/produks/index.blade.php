@@ -51,6 +51,11 @@
                                             Delete
                                         </button>
                                     </form>
+
+                                    <a href='{{ route('permintaanstok.create',$produk->id) }}'
+                                        class="btn btn-success btn-sm">
+                                            Update Stok
+                                    </a>
                                 </div>
                             </td>
                         </tr>

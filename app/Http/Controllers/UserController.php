@@ -64,4 +64,50 @@ class UserController extends Controller
 
         return redirect()->route('user.index')->with('success', 'User successfully updated');
     }
+
+    public function user()
+    {
+        return view('pages.users.profile');
+    }
+
+    public function updateuser(Request $request)
+    {
+
+        $request->validate([
+
+            'name'=>'required',
+
+            'email'=>'required|email',
+
+            'alamat'=>'nullable',
+
+            'no_hp'=>'nullable',
+
+        ]);
+
+        $data=[
+
+            'name'=>$request->name,
+
+            'email'=>$request->email,
+
+            'alamat'=>$request->alamat,
+
+            'no_hp'=>$request->no_hp
+
+        ];
+
+        if($request->filled('password')){
+
+            $data['password']=Hash::make($request->password);
+
+        }
+
+        DB::table('users')
+            ->where('id',auth()->id())
+            ->update($data);
+
+        return back()->with('success','Profil berhasil diperbarui.');
+
+    }
 }

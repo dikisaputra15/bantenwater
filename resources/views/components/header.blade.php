@@ -31,7 +31,7 @@
 
         <li class="nav-item mx-1">
             <h5>
-                {{ auth()->user()->roles }}
+                <a href="{{ route('profile') }}"> {{ auth()->user()->roles }} </a>
             </h5>
         </li>
 

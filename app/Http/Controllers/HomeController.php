@@ -28,7 +28,91 @@ class HomeController extends Controller
     public function dashboard(Request $request)
     {
         $produks = DB::table('produks')->orderBy('id', 'desc')->get();
-        return view('pages.dashboard', compact('produks'));
+
+        $totalPesanan = DB::table('pesanans')->count();
+
+        $totalPelanggan = DB::table('users')
+            ->where('roles','pelanggan')
+            ->count();
+
+        $stokProduk = DB::table('produks')
+            ->sum('stock');
+
+        $menungguPembayaran = DB::table('pesanans')
+            ->where('status_pembayaran','menunggu verifikasi')
+            ->count();
+
+        $pesananTerbaru = DB::table('pesanans')
+            ->join('users','pesanans.id_user','=','users.id')
+            ->select(
+                'pesanans.*',
+                'users.name'
+            )
+            ->latest()
+            ->limit(5)
+            ->get();
+
+        $chart = DB::table('pesanans')
+            ->selectRaw('MONTH(created_at) bulan, SUM(total) total')
+            ->groupBy('bulan')
+            ->pluck('total','bulan');
+
+        $permintaan = DB::table('permintaan_stoks')
+                ->join('produks','produks.id','=','permintaan_stoks.id_produk')
+                ->select(
+                    'permintaan_stoks.*',
+                    'produks.nama_produk'
+                )
+                ->latest()
+                ->get();
+
+        $pesananBaru = DB::table('pesanans')
+        ->where('status_pesanan','dikirim')
+        ->count();
+
+        $dalamPerjalanan = DB::table('pesanans')
+            ->where('status_pesanan','dalam perjalanan')
+            ->count();
+
+        $selesai = DB::table('pesanans')
+            ->where('status_pesanan','selesai')
+            ->count();
+
+        $pesanan = DB::table('pesanans')
+            ->join('users','users.id','=','pesanans.id_user')
+            ->select(
+                'pesanans.*',
+                'users.name'
+            )
+            ->latest()
+            ->get();
+
+        $tugas = DB::table('pesanans')
+            ->join('users','users.id','=','pesanans.id_user')
+            ->whereIn('status_pesanan',['dikirim','dalam perjalanan'])
+            ->select(
+                'pesanans.*',
+                'users.name',
+                'users.alamat_lengkap',
+                'users.no_hp'
+            )
+            ->first();
+
+        return view('pages.dashboard', compact(
+            'produks',
+            'totalPesanan',
+            'totalPelanggan',
+            'stokProduk',
+            'menungguPembayaran',
+            'pesananTerbaru',
+            'chart',
+            'permintaan',
+            'pesananBaru',
+            'dalamPerjalanan',
+            'selesai',
+            'pesanan',
+            'tugas'
+        ));
     }
 
     public function lihatpdf(Request $request)
